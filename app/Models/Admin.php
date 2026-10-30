@@ -49,22 +49,32 @@ class Admin extends Authenticatable
 
     public function hasPermission($permission)
     {
-        return $this->role && $this->role->permissions->contains('slug', $permission);
+        return $this->role && $this->role->hasPermission($permission);
+    }
+
+    public function hasAllPermissions($permissions)
+    {
+        return $this->role && $this->role->hasAllPermissions($permissions);
     }
 
     public function hasAnyPermission($permissions)
     {
-        if (!$this->role) {
-            return false;
-        }
+        return $this->role && $this->role->hasAnyPermission($permissions);
+    }
 
-        foreach ($permissions as $permission) {
-            if ($this->hasPermission($permission)) {
-                return true;
-            }
+    public function can($ability, $arguments = [])
+    {
+        // Support Laravel's Gate system
+        if (method_exists($this, 'hasPermission')) {
+            return $this->hasPermission($ability);
         }
+        
+        return parent::can($ability, $arguments);
+    }
 
-        return false;
+    public function getAllPermissions()
+    {
+        return $this->role ? $this->role->getCachedPermissions() : [];
     }
 
     public function isSuperAdmin()

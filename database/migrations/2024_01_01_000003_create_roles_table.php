@@ -14,7 +14,13 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);
+            $table->integer('level')->default(1);
+            $table->boolean('is_system')->default(false);
+            $table->json('metadata')->nullable();
             $table->timestamps();
+            
+            $table->index(['slug', 'status']);
+            $table->index('level');
         });
     }
 
